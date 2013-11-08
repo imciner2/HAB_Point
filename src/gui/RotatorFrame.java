@@ -36,6 +36,7 @@ public class RotatorFrame extends JPanel{
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		
 		tabs = new JTabbedPane();
+		
         //The following line enables to use scrolling tabs.
         tabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         add(tabs);
@@ -43,7 +44,6 @@ public class RotatorFrame extends JPanel{
 	
 	public void addRotator(int windowWidth, int windowHeight, String name) {
 		RotorPanel tempPanel = new RotorPanel(windowWidth, windowHeight, name); 
-		System.out.println(name);
 		panels.put(name, tempPanel);
 		
 		tabs.addTab(name, tempPanel);
