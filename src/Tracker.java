@@ -71,7 +71,7 @@ public class Tracker extends JFrame implements PacketUser{
 	 * Constructor for the program
 	 */
 	Tracker() {
-		super("HABET Tracker");		// Create the window
+		super("HAB Tracker");		// Create the window
 		buildMenu();	// Add the menus
 		
 		c = getContentPane();
@@ -126,12 +126,12 @@ public class Tracker extends JFrame implements PacketUser{
 		fileMenu.add(setLocationItem);
 		
 		exitItem.addActionListener(
-				new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e){
-						exit();
-					}
+			new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e){
+					exit();
 				}
+			}
 		);
 		
 		fileMenu.add(exitItem);
@@ -182,9 +182,9 @@ public class Tracker extends JFrame implements PacketUser{
 		JOptionPane.showMessageDialog(null, inputs, "Set Current Location", JOptionPane.PLAIN_MESSAGE);
 		
 		// Parse the gathered data
-		currLoc.Latitude = Integer.parseInt(latitude.getText());
-		currLoc.Longitude = Integer.parseInt(longitude.getText());
-		currLoc.Elevation = Integer.parseInt(elevation.getText());
+		currLoc.Latitude = Double.parseDouble(latitude.getText());
+		currLoc.Longitude = Double.parseDouble(longitude.getText());
+		currLoc.Elevation = Double.parseDouble(elevation.getText());
 	}
 	
 	/**

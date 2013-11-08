@@ -14,23 +14,23 @@ import rotatorFramework.*;
  * @author Ian McInerney
  *
  */
-public class YaesuGS232 extends TimerTask implements Rotator, NewOrientationListener{
+public class YaesuGS232_Local extends TimerTask implements Rotator, NewOrientationListener{
 
 	private List listeners = new ArrayList();
 	private CommPortIdentifier portId;
 	private SerialPort port;
 	private InputStream input;
 	private OutputStream output;
-	
-	private double elev_test;
-	private double azi_test;
+
 	
 	/**
 	 * Main constructor for the class
 	 * 
 	 * @param portNum The name of the port the rotator is on
 	 */
-	public YaesuGS232(String portNum) {
+	public YaesuGS232_Local(String portNum) {
+		System.out.println("Hello I am the local class!");
+		
 		try {
 			// Get the port identifier
 			portId = CommPortIdentifier.getPortIdentifier(portNum);

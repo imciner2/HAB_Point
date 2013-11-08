@@ -1,6 +1,12 @@
+# Ignore random temproary files
+*~
+
+# Ignore the bin folder
+/bin/*
 *.class
 
-# Package Files #
-*.jar
-*.war
-*.ear
+
+# Ignore the eclipse information
+.project
+.classpath
+

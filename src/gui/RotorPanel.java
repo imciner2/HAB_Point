@@ -3,6 +3,8 @@ package gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.Iterator;
@@ -25,29 +27,31 @@ public class RotorPanel extends JPanel implements CurrentOrientationListener{
 	
 	private List listeners = new ArrayList();
 	
-	String name;
-	Rotator rotor;
+	String name;		// The name of the rotator panel
+	Rotator rotor;		// The rotator object which this panel is referencing
 	
+	// Labels for the manual rotor control text boxes
 	JLabel elevLabel = new JLabel("Elevation:");
 	JLabel aziLabel = new JLabel("Azimuth:");
 	
+	// Variables used to create the dialog box to connect to a rotator
 	JLabel typeLabel = new JLabel("Rotator Type: ");
 	JLabel connectionLabel = new JLabel("  Location: "); 
-	JComponent connectPane = new JPanel();	// Panel to contain the connection controls
-	JComboBox<String> rotorTypes = new JComboBox();
-	JTextField connectionString = new JTextField(10);
-	JButton connect = new JButton("Connect");
-	ActionListener comboBoxAction;
+	JComponent connectPane = new JPanel();					// Panel to contain the connection controls
+	JComboBox<String> rotorTypes = new JComboBox();			// Combo box to allow selection of a rotator type
+	JTextField connectionString = new JTextField(10);		// Text box to allow entry of the rotator connection information
+	JButton connect = new JButton("Connect");				// Button to begin connection to the rotator
+	ActionListener rotorTypeAction;
 	ActionListener connectAction;
 	ActionListener disconnectAction;
 		
-	JComponent aziManPane = new JPanel();	// Panel to contain the manual azimuth controls
-	JComponent elevManPane = new JPanel();	// Panel to contain the manual elevation controls
-	JTextField elevMan = new JTextField(20);	// Manual elevation control input
-	JTextField aziMan = new JTextField(20);		// Manual azimuth control input
+	JComponent aziManPane = new JPanel();					// Panel to contain the manual azimuth controls
+	JComponent elevManPane = new JPanel();					// Panel to contain the manual elevation controls
+	JTextField elevMan = new JTextField(20);				// Manual elevation control input
+	JTextField aziMan = new JTextField(20);					// Manual azimuth control input
 	JCheckBox manOver = new JCheckBox("Manual Override");	// Checkbox to select override
-	ItemListener overAction;	// Listener to handle the change in override state
-	ActionListener enterAction;	// Listener to handle the enter key press in the text boxes
+	ItemListener overAction;								// Listener to handle the change in override state
+	ActionListener enterAction;								// Listener to handle the enter key press in the text boxes
 	Radial1Square elevKnob = new Radial1Square();
 	AzimuthDial aziKnob = new AzimuthDial();
 	
@@ -106,19 +110,13 @@ public class RotorPanel extends JPanel implements CurrentOrientationListener{
 		
 		// Configure the connection pane
 		
-		comboBoxAction = new ActionListener() {
+		rotorTypeAction = new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				switch(rotorTypes.getSelectedIndex()) {
-				case 0:
-					// Yaesu GS-232 Rotator
-					connectionString.setText("COM");
-					break;
-				case 1:
-					connectionString.setText("Drone");
-					break;
-				default:
-						break;
-				}
+				// Determine which rotator was selected
+				RotatorTypes selectedRotator = RotatorTypes.values()[rotorTypes.getSelectedIndex()];
+				
+				// Change the connection string accordingly
+				connectionString.setText(selectedRotator.getConnectionString());
 			}
 		};
 		
@@ -127,6 +125,7 @@ public class RotorPanel extends JPanel implements CurrentOrientationListener{
 				connectionString.setEditable(false);
 				rotorTypes.setEnabled(false);
 				connect.removeActionListener(connectAction);
+				startRotator();
 				connect.addActionListener(disconnectAction);
 				connect.setText("Disconnect");
 			}
@@ -142,14 +141,22 @@ public class RotorPanel extends JPanel implements CurrentOrientationListener{
 			}
 		};
 		
-		rotorTypes.insertItemAt("Yaesu GS-232", 0);
-		rotorTypes.insertItemAt("CyDrone", 1);
+		// Populate the rotator selection with all available rotators
+		for(RotatorTypes type : RotatorTypes.values()) {
+			rotorTypes.insertItemAt(type.getDescription(), type.ordinal());
+		}
+		
+		// Change the size of the rotator selector
 		rotorTypes.setMaximumSize(rotorTypes.getPreferredSize());
 		rotorTypes.setSelectedIndex(0);
-		rotorTypes.addActionListener(comboBoxAction);
+		rotorTypes.addActionListener(rotorTypeAction);
+		
+		// Populate the connection string information
 		connectionString.setText("COM");
 		connectionString.setMaximumSize(connectionString.getPreferredSize());
 		connect.addActionListener(connectAction);
+		
+		// Lay out the connection pane
 		connectPane.setLayout(new BoxLayout(connectPane, BoxLayout.LINE_AXIS));
 		connectPane.add(typeLabel);
 		connectPane.add(rotorTypes);
@@ -194,10 +201,38 @@ public class RotorPanel extends JPanel implements CurrentOrientationListener{
 	}
 	
 	private void startRotator() {
-		// Start the rotator
-		rotor = new YaesuGS232(port.getText());
-		rotor.addCurrentOrientationListener(this);	// Add the rotor panel to the listener list
-		//rotor.addNewOrientationListener(rotor);
+		// Determine which rotator was selected
+		RotatorTypes selectedRotator = RotatorTypes.values()[rotorTypes.getSelectedIndex()];
+		
+		// Get the rotator class infomation
+		try{
+			Class rotatorClass = Class.forName(selectedRotator.getClassName());
+			
+			Class[] types = {String.class};
+			Constructor rotorConstructor = rotatorClass.getConstructor(types);
+			
+			
+			// Start the desired rotator
+			rotor = (Rotator) rotorConstructor.newInstance(connectionString.getText());
+			rotor.addCurrentOrientationListener(this);	// Add the rotor panel to the listener list
+			//rotor.addNewOrientationListener(rotor);
+		} catch (ClassNotFoundException e) {
+			// The desired class doesn't exist
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// The constructor doesn't exist
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// I don't know what this does, but it won't work without it
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		}
+
 	}
 	
 	private void stopRotator() {
