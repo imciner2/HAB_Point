@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="trident.jar"/>
+	<classpathentry kind="lib" path="SteelSeries-3.9.18.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://dl.dropbox.com/u/84552/SteelSeries3/apidocs/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="ch-rxtx-2.2-20081207-win-x64/RXTXcomm.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="HABET Tracker/ch-rxtx-2.2-20081207-win-x64"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
